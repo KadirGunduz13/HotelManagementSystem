@@ -54,9 +54,11 @@ public class UserDAO {
         String sql;
 
         if (searchText == null || searchText.trim().isEmpty()) {
+            // Arama kutusu boşsa hepsini getir
             sql = "SELECT * FROM users WHERE role = 'CUSTOMER'";
         } else {
-            sql = "SELECT * FROM users WHERE role = 'CUSTOMER' AND (full_name LIKE ? OR tc_no LIKE ? OR phone LIKE ?)";
+            // Arama kutusu doluysa: İsim, TC, Telefon VEYA Kullanıcı Adı'na göre ara
+            sql = "SELECT * FROM users WHERE role = 'CUSTOMER' AND (full_name LIKE ? OR tc_no LIKE ? OR phone LIKE ? OR username LIKE ?)";
         }
 
         Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -64,17 +66,24 @@ public class UserDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (searchText != null && !searchText.trim().isEmpty()) {
                 String searchPattern = "%" + searchText + "%";
-                stmt.setString(1, searchPattern);
-                stmt.setString(2, searchPattern);
-                stmt.setString(3, searchPattern);
+
+                // 4 parametreyi de aynı arama metniyle dolduruyoruz
+                stmt.setString(1, searchPattern); // full_name için
+                stmt.setString(2, searchPattern); // tc_no için
+                stmt.setString(3, searchPattern); // phone için
+                stmt.setString(4, searchPattern); // username için (YENİ EKLENEN)
             }
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     customers.add(new Customer(
-                            rs.getInt("id"), rs.getString("tc_no"), rs.getString("username"),
-                            rs.getString("password"), rs.getString("full_name"),
-                            rs.getString("phone"), rs.getString("email")
+                            rs.getInt("id"),
+                            rs.getString("tc_no"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("full_name"),
+                            rs.getString("phone"),
+                            rs.getString("email")
                     ));
                 }
             }
