@@ -25,4 +25,9 @@ public class NotificationManager {
             observer.update(message);
         }
     }
+
+    // Gözlemci listesini temizlemek için yardımcı metot
+    public void removeAllObservers() {
+        observers.clear();
+    }
 }

@@ -2,73 +2,18 @@ package com.hotel.dao;
 
 import com.hotel.config.DatabaseConnection;
 import com.hotel.models.Reservation;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationDAO {
 
-    // Tüm Rezervasyonları Listele (JOIN ile detaylı)
-    public java.util.List<com.hotel.models.Reservation> getAllReservations() {
-        java.util.List<com.hotel.models.Reservation> list = new java.util.ArrayList<>();
-
-        // ÖNEMLİ: JOIN işlemi ile kullanıcı adını ve oda numarasını da çekiyoruz
-        String sql = "SELECT r.*, u.full_name, rm.room_number " +
-                "FROM reservations r " +
-                "JOIN users u ON r.customer_id = u.id " +
-                "JOIN rooms rm ON r.room_id = rm.id";
-
-        try (java.sql.Connection conn = com.hotel.config.DatabaseConnection.getInstance().getConnection();
-             java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
-             java.sql.ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                // Temel verileri al
-                com.hotel.models.Reservation res = new com.hotel.models.Reservation(
-                        rs.getInt("id"),
-                        rs.getInt("customer_id"),
-                        rs.getInt("room_id"),
-                        rs.getDate("check_in_date"),
-                        rs.getDate("check_out_date"),
-                        rs.getDouble("total_price"),
-                        rs.getString("status")
-                );
-
-                // EKSTRA: İsim ve Oda numarasını da nesneye yükle
-                res.setCustomerName(rs.getString("full_name"));   // "Ali Veli"
-                res.setRoomNumber(rs.getString("room_number"));   // "101"
-
-                list.add(res);
-            }
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    // Durum Güncelleme (Check-In / Check-Out için)
-    public boolean updateStatus(int id, String newStatus) {
-        String sql = "UPDATE reservations SET status = ? WHERE id = ?";
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newStatus);
-            stmt.setInt(2, id);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // Yeni Rezervasyon Oluştur (Müşteri için)
-    // Yeni Rezervasyon Oluştur (Müşteri için)
     public boolean createReservation(Reservation res) {
         String sql = "INSERT INTO reservations (customer_id, room_id, check_in_date, check_out_date, total_price, status) VALUES (?, ?, ?, ?, ?, ?)";
-        Connection conn = DatabaseConnection.getInstance().getConnection();
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, res.getCustomerId());
             stmt.setInt(2, res.getRoomId());
             stmt.setDate(3, res.getCheckInDate());
@@ -76,107 +21,144 @@ public class ReservationDAO {
             stmt.setDouble(5, res.getTotalPrice());
             stmt.setString(6, "PENDING");
 
-            // DEĞİŞİKLİK BURADA:
-            // Eskiden: return stmt.executeUpdate() > 0;
-            // Şimdi: Sonucu bir değişkene alıyoruz, kontrol ediyoruz.
+            int result = stmt.executeUpdate();
 
-            int rowCount = stmt.executeUpdate(); // 1. Veritabanına kaydet
+            if (result > 0) {
+                // --- DÜZELTME BURADA ---
+                // ID'leri kullanarak gerçek İsim ve Oda Numarasını buluyoruz
+                String customerName = getCustomerNameById(res.getCustomerId());
+                String roomNumber = getRoomNumberById(res.getRoomId());
 
-            if (rowCount > 0) {
-                // 2. Kayıt başarılıysa OBSERVER devreye girsin
+                // Log Mesajını anlamlı hale getiriyoruz
+                String logMessage = "Yeni Rezervasyon! Müşteri: " + customerName +
+                        " | Oda: " + roomNumber +
+                        " | Tutar: " + res.getTotalPrice() + " TL";
+
+                // Observer'ı tetikle
                 try {
-                    // Singleton üzerinden bildirim yöneticisini çağır
+                    // HATA ÇÖZÜMÜ: 'new' yerine 'getInstance()' kullanıyoruz
                     com.hotel.patterns.NotificationManager notifier = com.hotel.patterns.NotificationManager.getInstance();
 
-                    // Gözlemciyi ekle (Demo olduğu için burada ekliyoruz)
-                    notifier.addObserver(new com.hotel.patterns.ManagerSMSObserver());
+                    // Listeyi temizle (Böylece aynı SMS 2 kere gitmez)
+                    notifier.removeAllObservers();
 
-                    // 2. Gözlemci: Veritabanına Log atar (YENİ EKLEDİĞİMİZ)
+                    // Gözlemcileri ekle
+                    notifier.addObserver(new com.hotel.patterns.ManagerSMSObserver());
                     notifier.addObserver(new com.hotel.patterns.DatabaseLoggerObserver());
 
-                    // Bildirimi herkese yay
-                    notifier.notifyAll("Yeni Rezervasyon! Oda: " + res.getRoomId() + " | Tutar: " + res.getTotalPrice() + " TL");
+                    // Bildirimi Gönder
+                    notifier.notifyAll(logMessage);
 
-                } catch (Exception e) {
-                    System.out.println("Bildirim gönderilemedi ama rezervasyon yapıldı: " + e.getMessage());
+                } catch(Exception e) {
+                    System.out.println("Bildirim hatası: " + e.getMessage());
                 }
-
-                // 3. Artık gönül rahatlığıyla true dönebiliriz
                 return true;
-            } else {
-                return false; // Kayıt yapılamadı
             }
-
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // Müşterinin kendi rezervasyonlarını getirmesi için
-    public List<Reservation> getReservationsByCustomerId(int customerId) {
-        List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT r.*, rm.room_number FROM reservations r " +
-                "JOIN rooms rm ON r.room_id = rm.id " +
-                "WHERE r.customer_id = ? ORDER BY r.created_at DESC";
-
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, customerId);
+    // YARDIMCI METOT 1: ID'den Müşteri İsmini Bulur
+    private String getCustomerNameById(int id) {
+        String sql = "SELECT full_name FROM users WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return rs.getString("full_name");
+        } catch (SQLException e) {}
+        return "Bilinmiyor";
+    }
+
+    // YARDIMCI METOT 2: ID'den Oda Numarasını Bulur
+    private String getRoomNumberById(int id) {
+        String sql = "SELECT room_number FROM rooms WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return rs.getString("room_number");
+        } catch (SQLException e) {}
+        return "Bilinmiyor";
+    }
+
+    // --- MEVCUT DİĞER METOTLAR (DEĞİŞMEDİ) ---
+
+    public List<Reservation> getAllReservations() {
+        List<Reservation> list = new ArrayList<>();
+        String sql = "SELECT r.*, u.full_name, rm.room_number FROM reservations r " +
+                "JOIN users u ON r.customer_id = u.id " +
+                "JOIN rooms rm ON r.room_id = rm.id";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Reservation res = new Reservation(
-                        rs.getInt("id"),
-                        rs.getInt("customer_id"),
-                        rs.getInt("room_id"),
-                        rs.getDate("check_in_date"),
-                        rs.getDate("check_out_date"),
-                        rs.getDouble("total_price"),
-                        rs.getString("status")
+                        rs.getInt("id"), rs.getInt("customer_id"), rs.getInt("room_id"),
+                        rs.getDate("check_in_date"), rs.getDate("check_out_date"),
+                        rs.getDouble("total_price"), rs.getString("status")
                 );
+                res.setCustomerName(rs.getString("full_name"));
                 res.setRoomNumber(rs.getString("room_number"));
                 list.add(res);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
 
-    // Rezervasyon İptali (Transaction Kullanımı)
-    public boolean cancelReservation(int reservationId, int roomId) {
-        Connection conn = DatabaseConnection.getInstance().getConnection();
+    public List<Reservation> getReservationsByCustomerId(int customerId) {
+        List<Reservation> list = new ArrayList<>();
+        String sql = "SELECT r.*, u.full_name, rm.room_number FROM reservations r " +
+                "JOIN users u ON r.customer_id = u.id " +
+                "JOIN rooms rm ON r.room_id = rm.id WHERE r.customer_id = ?";
 
-        try {
-            // Otomatik kaydetmeyi kapat (Transaction Başlat)
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, customerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Reservation res = new Reservation(
+                            rs.getInt("id"), rs.getInt("customer_id"), rs.getInt("room_id"),
+                            rs.getDate("check_in_date"), rs.getDate("check_out_date"),
+                            rs.getDouble("total_price"), rs.getString("status")
+                    );
+                    res.setCustomerName(rs.getString("full_name"));
+                    res.setRoomNumber(rs.getString("room_number"));
+                    list.add(res);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean updateStatus(int id, String status) {
+        String sql = "UPDATE reservations SET status = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
+    public boolean cancelReservation(int resId, int roomId) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection()) {
             conn.setAutoCommit(false);
-
-            // 1. Adım: Rezervasyon durumunu CANCELLED yap
-            String sql1 = "UPDATE reservations SET status = 'CANCELLED' WHERE id = ?";
-            try (PreparedStatement stmt1 = conn.prepareStatement(sql1)) {
-                stmt1.setInt(1, reservationId);
-                stmt1.executeUpdate();
-            }
-
-            // 2. Adım: Odayı tekrar MÜSAİT (AVAILABLE) yap
-            String sql2 = "UPDATE rooms SET status = 'AVAILABLE' WHERE id = ?";
-            try (PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
-                stmt2.setInt(1, roomId);
-                stmt2.executeUpdate();
-            }
-
-            // Her şey yolundaysa kaydet (Commit)
-            conn.commit();
-            conn.setAutoCommit(true); // Eski haline getir
-            return true;
-
-        } catch (SQLException e) {
-            // Hata varsa her şeyi geri al (Rollback)
-            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            e.printStackTrace();
-            return false;
-        }
+            try (PreparedStatement s1 = conn.prepareStatement("UPDATE reservations SET status='CANCELLED' WHERE id=?");
+                 PreparedStatement s2 = conn.prepareStatement("UPDATE rooms SET status='AVAILABLE' WHERE id=?")) {
+                s1.setInt(1, resId); s1.executeUpdate();
+                s2.setInt(1, roomId); s2.executeUpdate();
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                return false;
+            } finally { conn.setAutoCommit(true); }
+        } catch (SQLException e) { return false; }
     }
 }
