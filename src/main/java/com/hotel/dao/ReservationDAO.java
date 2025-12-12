@@ -10,22 +10,22 @@ import java.util.List;
 public class ReservationDAO {
 
     // Tüm Rezervasyonları Listele (JOIN ile detaylı)
-    public List<Reservation> getAllReservations() {
-        List<Reservation> list = new ArrayList<>();
-        // SQL JOIN: Rezervasyonlar + Kullanıcılar + Odalar tablolarını birleştiriyoruz
+    public java.util.List<com.hotel.models.Reservation> getAllReservations() {
+        java.util.List<com.hotel.models.Reservation> list = new java.util.ArrayList<>();
+
+        // ÖNEMLİ: JOIN işlemi ile kullanıcı adını ve oda numarasını da çekiyoruz
         String sql = "SELECT r.*, u.full_name, rm.room_number " +
                 "FROM reservations r " +
                 "JOIN users u ON r.customer_id = u.id " +
-                "JOIN rooms rm ON r.room_id = rm.id " +
-                "ORDER BY r.created_at DESC";
+                "JOIN rooms rm ON r.room_id = rm.id";
 
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (java.sql.Connection conn = com.hotel.config.DatabaseConnection.getInstance().getConnection();
+             java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+             java.sql.ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Reservation res = new Reservation(
+                // Temel verileri al
+                com.hotel.models.Reservation res = new com.hotel.models.Reservation(
                         rs.getInt("id"),
                         rs.getInt("customer_id"),
                         rs.getInt("room_id"),
@@ -35,13 +35,13 @@ public class ReservationDAO {
                         rs.getString("status")
                 );
 
-                // Ekstra bilgileri (Ad ve Oda No) nesneye ekliyoruz
-                res.setCustomerName(rs.getString("full_name"));
-                res.setRoomNumber(rs.getString("room_number"));
+                // EKSTRA: İsim ve Oda numarasını da nesneye yükle
+                res.setCustomerName(rs.getString("full_name"));   // "Ali Veli"
+                res.setRoomNumber(rs.getString("room_number"));   // "101"
 
                 list.add(res);
             }
-        } catch (SQLException e) {
+        } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
         return list;
