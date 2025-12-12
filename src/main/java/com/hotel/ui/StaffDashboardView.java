@@ -177,11 +177,9 @@ public class StaffDashboardView {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Reservation, String> colCustomer = new TableColumn<>("Müşteri");
-        // Burası "getCustomerName" metodunu çağırmalı:
         colCustomer.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getCustomerName()));
 
         TableColumn<Reservation, String> colRoom = new TableColumn<>("Oda No");
-        // Burası "getRoomNumber" metodunu çağırmalı:
         colRoom.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getRoomNumber()));
 
         TableColumn<Reservation, Date> colCheckIn = new TableColumn<>("Giriş");
