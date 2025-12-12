@@ -13,31 +13,30 @@ import java.util.List;
 
 public class RoomDAO {
 
-    public List<Room> getAllRooms() {
-        List<Room> rooms = new ArrayList<>();
+    public java.util.List<com.hotel.models.Room> getAllRooms() {
+        java.util.List<com.hotel.models.Room> rooms = new java.util.ArrayList<>();
         String sql = "SELECT * FROM rooms";
 
-        // DÜZELTME: Bağlantı dışarı alındı
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (java.sql.Connection conn = com.hotel.config.DatabaseConnection.getInstance().getConnection();
+             java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+             java.sql.ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Room room = RoomFactory.createRoom(
+                // 1. Fabrika odayı üretir (Ama ID'si 0 olarak gelir)
+                com.hotel.models.Room r = com.hotel.services.RoomFactory.createRoom(
                         rs.getString("type"),
-                        rs.getInt("id"),
+                        rs.getInt("capacity"),
                         rs.getString("room_number"),
                         rs.getDouble("price_per_night"),
                         rs.getString("status")
                 );
 
-                if (room != null) {
-                    rooms.add(room);
-                }
-            }
+                // 2. KRİTİK DÜZELTME: Veritabanındaki GERÇEK ID'yi nesneye işliyoruz
+                r.setId(rs.getInt("id"));
 
-        } catch (SQLException e) {
+                rooms.add(r);
+            }
+        } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
         return rooms;

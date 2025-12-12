@@ -1,9 +1,10 @@
 package com.hotel.models;
 
 public class StandardRoom extends Room {
-    public StandardRoom(int id, String roomNumber, double price, String status) {
-        // Standart oda varsayılan kapasitesi: 2
-        super(id, roomNumber, price, 2, status);
+    // Constructor'a 'int capacity' eklendi
+    public StandardRoom(int id, String roomNumber, double price, int capacity, String status) {
+        // super(...) içine sabit 2 yerine gelen 'capacity' değişkenini koyduk
+        super(id, roomNumber, price, capacity, status);
     }
 
     @Override

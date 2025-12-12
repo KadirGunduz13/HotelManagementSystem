@@ -119,31 +119,50 @@ public class StaffDashboardView {
         Button btnFindRooms = new Button("Uygun Odaları Getir");
         ComboBox<Room> cmbRoom = new ComboBox<>();
         cmbRoom.setPromptText("Önce Oda Arayınız");
-        cmbRoom.setPrefWidth(200);
+        cmbRoom.setPrefWidth(250); // Genişliği biraz artırdık ki sığsın
 
+        // GÜNCELLEME: Listede görünecek metni değiştiriyoruz
         cmbRoom.setConverter(new StringConverter<Room>() {
             @Override
-            public String toString(Room r) { return r != null ? "Oda: " + r.getRoomNumber() + " (" + r.getType() + ") - " + r.getPrice() + " TL" : ""; }
+            public String toString(Room r) {
+                if (r == null) return "";
+                // Yeni Format: "Oda: 301 (FAMILY - 5 Kişilik) - 4500.0 TL"
+                return "Oda: " + r.getRoomNumber() +
+                        " (" + r.getType() + " - " + r.getCapacity() + " Kişilik) - " +
+                        r.getPrice() + " TL";
+            }
+
             @Override
             public Room fromString(String string) { return null; }
         });
 
         btnFindRooms.setOnAction(e -> {
             int capacity = 0;
-            try { if(!txtCapacity.getText().isEmpty()) capacity = Integer.parseInt(txtCapacity.getText()); }
-            catch(NumberFormatException ex) {}
-            int finalCap = capacity;
+            try {
+                if(!txtCapacity.getText().isEmpty()) capacity = Integer.parseInt(txtCapacity.getText());
+            } catch(NumberFormatException ex) {}
+
+            final int finalCap = capacity;
 
             List<Room> availableRooms = roomDAO.getAllRooms().stream()
+                    // 1. Sadece Müsait Olanları Al
                     .filter(r -> "AVAILABLE".equals(r.getStatus()))
+                    // 2. Kapasitesi yetenleri Al (Örn: 2 girdiyse 2,3,4,5 hepsi gelir)
                     .filter(r -> r.getCapacity() >= finalCap)
+                    // 3. SIRALAMA (Burayı Ekledik)
+                    // Önce Kapasiteye göre Küçükten -> Büyüğe (2, 3, 4...)
+                    // Sonra Oda Numarasına göre (101, 102...)
+                    .sorted(java.util.Comparator.comparingInt(Room::getCapacity)
+                            .thenComparing(Room::getRoomNumber))
                     .collect(Collectors.toList());
 
             if(availableRooms.isEmpty()) {
                 showAlert("Uygun oda bulunamadı!", Alert.AlertType.WARNING);
+                cmbRoom.getItems().clear(); // Liste boşsa temizle
             } else {
                 cmbRoom.setItems(FXCollections.observableArrayList(availableRooms));
-                cmbRoom.show();
+                cmbRoom.getSelectionModel().selectFirst(); // İlk sıradakini (en uygununu) otomatik seç
+                cmbRoom.show(); // Listeyi otomatik aç
             }
         });
 
@@ -349,11 +368,24 @@ public class StaffDashboardView {
         formLayout.getChildren().addAll(new Label("Yeni Oda:"), txtRoomNo, cmbType, txtCapacity, txtPrice, btnAdd);
 
         TableView<Room> table = new TableView<>();
-        TableColumn<Room, String> colNum = new TableColumn<>("Oda No"); colNum.setCellValueFactory(new PropertyValueFactory<>("roomNumber"));
-        TableColumn<Room, String> colType = new TableColumn<>("Tip"); colType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        TableColumn<Room, Integer> colCap = new TableColumn<>("Kapasite"); colCap.setCellValueFactory(new PropertyValueFactory<>("capacity"));
-        TableColumn<Room, Double> colPrice = new TableColumn<>("Fiyat"); colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
-        TableColumn<Room, String> colStatus = new TableColumn<>("Durum"); colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        TableColumn<Room, String> colNum = new TableColumn<>("Oda No");
+        colNum.setCellValueFactory(new PropertyValueFactory<>("roomNumber"));
+
+        TableColumn<Room, String> colType = new TableColumn<>("Tip");
+        colType.setCellValueFactory(new PropertyValueFactory<>("type"));
+
+        // --- HATALI KISIM BURASIYDI ---
+        TableColumn<Room, Integer> colCap = new TableColumn<>("Kapasite");
+        // Buranın "id" DEĞİL "capacity" olduğundan emin ol:
+        colCap.setCellValueFactory(new PropertyValueFactory<>("capacity"));
+
+        TableColumn<Room, Double> colPrice = new TableColumn<>("Fiyat");
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+        TableColumn<Room, String> colStatus = new TableColumn<>("Durum");
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
         table.getColumns().addAll(colNum, colType, colCap, colPrice, colStatus);
 
         ContextMenu ctx = new ContextMenu();

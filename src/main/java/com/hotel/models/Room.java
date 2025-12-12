@@ -34,4 +34,8 @@ public abstract class Room {
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
+    // BU METOD EKSİKTİ, O YÜZDEN ID SIFIR KALIYORDU
+    public void setId(int id) {
+        this.id = id;
+    }
 }
