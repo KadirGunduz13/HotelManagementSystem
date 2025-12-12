@@ -6,45 +6,40 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    // 1. ADIM: Tekil (static) örneği tutacak değişken
-    // Volatile: Çoklu iş parçacığı (Thread) durumlarında belleği senkronize eder.
-    private static volatile DatabaseConnection instance;
+    private static DatabaseConnection instance;
     private Connection connection;
 
-    // Veritabanı Bilgileri (Kendi şifreni buraya yazmalısın)
+    // Veritabanı Bilgileri (Kendi şifrenle güncellemeyi unutma!)
     private final String URL = "jdbc:mysql://localhost:3306/hotel_db";
-    private final String USERNAME = "root";
-    private final String PASSWORD = ""; // MySQL kurulumunda şifre koyduysan buraya yaz!
+    private final String USER = "root";
+    private final String PASSWORD = ""; // Buraya kendi şifreni yaz
 
-    // 2. ADIM: Constructor (Yapıcı) private olmalı!
-    // Böylece dışarıdan 'new DatabaseConnection()' denilerek yeni nesne üretilmesi engellenir.
     private DatabaseConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            System.out.println("Veritabanı bağlantısı başarılı! (Singleton)");
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-            System.out.println("Veritabanı bağlantısı hatası: " + e.getMessage());
         }
     }
 
-    // 3. ADIM: Global erişim noktası
-    // Eğer nesne yoksa oluşturur, varsa olanı gönderir.
     public static DatabaseConnection getInstance() {
         if (instance == null) {
-            // Thread-safe (İplik güvenliği) için senkronize blok
-            synchronized (DatabaseConnection.class) {
-                if (instance == null) {
-                    instance = new DatabaseConnection();
-                }
-            }
+            instance = new DatabaseConnection();
         }
         return instance;
     }
 
-    // Bağlantı nesnesini dışarıya verir
+    // KRİTİK DÜZELTME BURADA:
     public Connection getConnection() {
+        try {
+            // Eğer bağlantı kopmuşsa veya kapatılmışsa YENİDEN BAĞLAN
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return connection;
     }
 }
