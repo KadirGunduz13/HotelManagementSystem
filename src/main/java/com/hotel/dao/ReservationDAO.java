@@ -91,6 +91,9 @@ public class ReservationDAO {
                     // Gözlemciyi ekle (Demo olduğu için burada ekliyoruz)
                     notifier.addObserver(new com.hotel.patterns.ManagerSMSObserver());
 
+                    // 2. Gözlemci: Veritabanına Log atar (YENİ EKLEDİĞİMİZ)
+                    notifier.addObserver(new com.hotel.patterns.DatabaseLoggerObserver());
+
                     // Bildirimi herkese yay
                     notifier.notifyAll("Yeni Rezervasyon! Oda: " + res.getRoomId() + " | Tutar: " + res.getTotalPrice() + " TL");
 
