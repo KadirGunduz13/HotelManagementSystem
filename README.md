@@ -139,6 +139,27 @@ MySQL'de `hotel_db` adında bir veritabanı oluşturun ve `sql/database.sql` dos
 private static final String URL = "jdbc:mysql://localhost:3306/hotel_db";
 private static final String USER = "root";
 private static final String PASSWORD = "sifreniz";
+```
 
+**4. Çalıştırın**
+Projenin Launcher.java dosyasını çalıştırın.
 
+📝 UML Diyagramları
+Projenin mimarisini daha iyi anlamak için çizilen diyagramlar:
 
+Abstract Class Diyagramı
+<img width="100%" alt="Abstract Class Diyagram" src="https://github.com/user-attachments/assets/f7bf29c9-fe95-46fc-8ada-abe6227bd968" />
+
+Sequence Diyagramı (Rezervasyon Senaryosu)
+<img width="100%" alt="Sequence Diyagram" src="https://github.com/user-attachments/assets/992205c1-fec5-418c-b666-3a60ed899986" />
+
+Use-Case Diyagramı
+<img width="100%" alt="Use-Case Diyagram" src="https://github.com/user-attachments/assets/5e574e60-1bb8-419c-9d79-329cb30b650c" />
+
+---
+
+Geliştiriciler: Kadir Gündüz, Azad Bedir, Umutcan Oğuz
+
+Ders: Yazılım Mimarisi ve Tasarımı
+
+Tarih: Aralık 2025
