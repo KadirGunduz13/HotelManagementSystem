@@ -112,8 +112,11 @@ MySQL'de hotel_db adında bir veritabanı oluşturun ve sql/database.sql dosyas�
 DatabaseConnection.java dosyasındaki kullanıcı adı ve şifreyi kendi MySQL bilgilerinizle güncelleyin:
 
 private static final String URL = "jdbc:mysql://localhost:3306/hotel_db";
+
 private static final String USER = "root";
+
 private static final String PASSWORD = "sifreniz";
+
 
 ### 4. Çalıştırın
 Projenin Launcher.java dosyasını çalıştırın.
@@ -135,3 +138,9 @@ Projenin mimarisini daha iyi anlamak için çizilen diyagramlar:
 
 ![Use-Case Diyagram](https://github.com/user-attachments/assets/193e4c2c-edd7-4124-8f3d-c383126a4aec)
 
+---
+Geliştiriciler: Kadir Gündüz, Azad Bedir, Umutcan Oğuz
+
+Ders: Yazılım Mimarisi ve Tasarımı
+
+Tarih: Aralık 2025
