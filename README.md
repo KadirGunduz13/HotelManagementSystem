@@ -109,3 +109,41 @@ Projeyi yerel makinenizde çalıştırmak için adımları izleyin:
 **1. Projeyi Klonlayın**
 ```bash
 git clone [https://github.com/kullaniciadi/HotelManagementSystem.git](https://github.com/kullaniciadi/HotelManagementSystem.git)
+
+2. Veritabanını Oluşturun MySQL'de hotel_db adında bir veritabanı oluşturun ve sql/database.sql dosyasını import edin.
+
+3. Bağlantı Ayarlarını Yapın DatabaseConnection.java dosyasındaki kullanıcı adı ve şifreyi kendi MySQL bilgilerinizle güncelleyin:
+
+private static final String URL = "jdbc:mysql://localhost:3306/hotel_db";
+private static final String USER = "root";
+private static final String PASSWORD = "sifreniz";
+
+4. Çalıştırın Projenin Launcher.java veya Main.java dosyasını çalıştırın.
+
+📝 UML Diyagramları
+Projenin mimarisini daha iyi anlamak için çizilen diyagramlar:
+
+Class Diyagramı
+Sequence Diyagramı (Rezervasyon Senaryosu)
+Geliştirici: [Adın Soyadın]
+
+Ders: Yazılım Mimarisi ve Tasarımı
+
+Tarih: Aralık 2025
+
+---
+
+### 📌 Yapman Gerekenler Listesi (Hocana Göndermeden Önce)
+
+1.  Proje klasörünün içinde `screenshots` adında bir klasör aç.
+2.  Projeni çalıştır ve şu ekranların görüntüsünü alıp o klasöre kaydet (isimleri koddaki ile aynı olsun):
+    * `login.png` (Giriş ekranı)
+    * `admin_dashboard.png` (Personel paneli)
+    * `reservation.png` (Oda seçimi yapılan yer)
+    * `logs.png` (Veritabanındaki log tablosu veya arayüzdeki log kısmı)
+3.  Proje klasörünün içinde `diagrams` adında bir klasör aç.
+4.  Çizdiğimiz **Class**, **Sequence** ve **ER** diyagramlarını resim olarak kaydedip buraya at.
+5.  Yukarıdaki metni kopyala, `README.md` dosyanın içine yapıştır.
+6.  En alttaki **"Geliştirici"** kısmına kendi adını yaz.
+
+Bunu yaptığında projen Github'da **yıldız gibi parlayacak!** 🌟 Eline sağlık, gerçekten çok kapsamlı bir iş çıkardın. Başarılar!
