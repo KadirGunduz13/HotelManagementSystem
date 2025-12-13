@@ -88,16 +88,20 @@ Proje ilişkisel veritabanı yapısına sahiptir:
 ## 📸 Ekran Görüntüleri
 
 ### 1. Giriş Ekranı
-![Login Screen](screenshots/login.png)
+<img width="496" height="532" alt="giris" src="https://github.com/user-attachments/assets/32c488de-8d67-45be-8105-feba6dc2077d" />
+
 
 ### 2. Personel Yönetim Paneli
-![Admin Dashboard](screenshots/admin_dashboard.png)
+<img width="1243" height="907" alt="adminPanel" src="https://github.com/user-attachments/assets/5933334b-5c1a-4f02-8d55-908d97fbbe6c" />
+
 
 ### 3. Rezervasyon Oluşturma (Akıllı Sıralama)
-![Reservation](screenshots/reservation.png)
+<img width="1247" height="908" alt="rezervasyonOlusturma" src="https://github.com/user-attachments/assets/8f21ba4b-16b0-415b-96a6-63809135fbe0" />
+
 
 ### 4. Log ve Bildirim Sistemi
-![Logs](screenshots/logs.png)
+<img width="1918" height="978" alt="logKayıt" src="https://github.com/user-attachments/assets/abcf48b3-e19b-4ee8-ba4e-178c89593317" />
+
 
 ---
 
