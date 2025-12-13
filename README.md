@@ -105,8 +105,33 @@ Proje ilişkisel veritabanı yapısına sahiptir:
 
 ---
 
-### 2. Veritabanını Oluşturun:
+### 2. Veritabanını Oluşturun
 MySQL'de hotel_db adında bir veritabanı oluşturun ve sql/database.sql dosyasını import edin.
 
-### 3. Bağlantı Ayarlarını Yapın:
+### 3. Bağlantı Ayarlarını Yapın
 DatabaseConnection.java dosyasındaki kullanıcı adı ve şifreyi kendi MySQL bilgilerinizle güncelleyin:
+
+private static final String URL = "jdbc:mysql://localhost:3306/hotel_db";
+private static final String USER = "root";
+private static final String PASSWORD = "sifreniz";
+
+### 4. Çalıştırın
+Projenin Launcher.java dosyasını çalıştırın.
+
+---
+
+📝 UML Diyagramları
+Projenin mimarisini daha iyi anlamak için çizilen diyagramlar:
+
+### Abstract Class Diyagramı
+
+<img width="1742" height="668" alt="Abstract Class Diyagram" src="https://github.com/user-attachments/assets/f7bf29c9-fe95-46fc-8ada-abe6227bd968" />
+
+### Sequence Diyagramı (Rezervasyon Senaryosu)
+
+<img width="1452" height="662" alt="Sequence Diyagram" src="https://github.com/user-attachments/assets/992205c1-fec5-418c-b666-3a60ed899986" />
+
+### Use-Case Diyagramı
+
+![Use-Case Diyagram](https://github.com/user-attachments/assets/193e4c2c-edd7-4124-8f3d-c383126a4aec)
+
