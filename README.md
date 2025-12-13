@@ -105,6 +105,8 @@ Proje ilişkisel veritabanı yapısına sahiptir:
 
 ---
 
-2. Veritabanını Oluşturun MySQL'de hotel_db adında bir veritabanı oluşturun ve sql/database.sql dosyasını import edin.
+### 2. Veritabanını Oluşturun:
+MySQL'de hotel_db adında bir veritabanı oluşturun ve sql/database.sql dosyasını import edin.
 
-3. Bağlantı Ayarlarını Yapın DatabaseConnection.java dosyasındaki kullanıcı adı ve şifreyi kendi MySQL bilgilerinizle güncelleyin:
+### 3. Bağlantı Ayarlarını Yapın:
+DatabaseConnection.java dosyasındaki kullanıcı adı ve şifreyi kendi MySQL bilgilerinizle güncelleyin:
