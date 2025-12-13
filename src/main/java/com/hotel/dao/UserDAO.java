@@ -54,10 +54,8 @@ public class UserDAO {
         String sql;
 
         if (searchText == null || searchText.trim().isEmpty()) {
-            // Arama kutusu boşsa hepsini getir
             sql = "SELECT * FROM users WHERE role = 'CUSTOMER'";
         } else {
-            // Arama kutusu doluysa: İsim, TC, Telefon VEYA Kullanıcı Adı'na göre ara
             sql = "SELECT * FROM users WHERE role = 'CUSTOMER' AND (full_name LIKE ? OR tc_no LIKE ? OR phone LIKE ? OR username LIKE ?)";
         }
 
@@ -67,7 +65,6 @@ public class UserDAO {
             if (searchText != null && !searchText.trim().isEmpty()) {
                 String searchPattern = "%" + searchText + "%";
 
-                // 4 parametreyi de aynı arama metniyle dolduruyoruz
                 stmt.setString(1, searchPattern); // full_name için
                 stmt.setString(2, searchPattern); // tc_no için
                 stmt.setString(3, searchPattern); // phone için
@@ -93,12 +90,10 @@ public class UserDAO {
         return customers;
     }
 
-    // GÜNCELLENMİŞ KAYIT METODU (Çoklu Kontrol)
     public boolean registerCustomer(String tcNo, String username, String password, String fullName, String phone, String email) {
 
         Connection conn = DatabaseConnection.getInstance().getConnection();
 
-        // 1. ADIM: Önce bu bilgilerle kayıtlı biri var mı kontrol et
         String checkSql = "SELECT count(*) FROM users WHERE tc_no = ? OR username = ? OR phone = ? OR email = ? OR full_name = ?";
 
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
@@ -110,7 +105,6 @@ public class UserDAO {
 
             ResultSet rs = checkStmt.executeQuery();
             if (rs.next() && rs.getInt(1) > 0) {
-                // Eğer kayıt varsa işlemi durdur ve false dön (Kayıt başarısız)
                 System.out.println("HATA: Girilen bilgilerden biri (TC, Tel, Email, Ad veya Kullanıcı Adı) sistemde zaten kayıtlı!");
                 return false;
             }
@@ -119,7 +113,6 @@ public class UserDAO {
             return false;
         }
 
-        // 2. ADIM: Kimse yoksa kaydı yap
         String insertSql = "INSERT INTO users (tc_no, username, password, full_name, phone, email, role) VALUES (?, ?, ?, ?, ?, ?, 'CUSTOMER')";
 
         try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {

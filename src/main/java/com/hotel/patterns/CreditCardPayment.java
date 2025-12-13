@@ -12,6 +12,6 @@ public class CreditCardPayment implements PaymentStrategy {
     @Override
     public boolean pay(double amount) {
         System.out.println("Kredi Kartı (" + cardNumber + ") ile " + amount + " TL ödeme alındı.");
-        return true; // Ödeme başarılı simülasyonu
+        return true;
     }
 }

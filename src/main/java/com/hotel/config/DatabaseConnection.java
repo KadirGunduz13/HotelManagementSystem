@@ -9,10 +9,9 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
     private Connection connection;
 
-    // Veritabanı Bilgileri (Kendi şifrenle güncellemeyi unutma!)
     private final String URL = "jdbc:mysql://localhost:3306/hotel_db";
     private final String USER = "root";
-    private final String PASSWORD = ""; // Buraya kendi şifreni yaz
+    private final String PASSWORD = "";
 
     private DatabaseConnection() {
         try {
@@ -30,10 +29,8 @@ public class DatabaseConnection {
         return instance;
     }
 
-    // KRİTİK DÜZELTME BURADA:
     public Connection getConnection() {
         try {
-            // Eğer bağlantı kopmuşsa veya kapatılmışsa YENİDEN BAĞLAN
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
             }

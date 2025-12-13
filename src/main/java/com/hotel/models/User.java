@@ -6,11 +6,10 @@ public abstract class User {
     protected String username;
     protected String password;
     protected String fullName;
-    protected String phone; // YENİ
-    protected String email; // YENİ
+    protected String phone;
+    protected String email;
     protected String role;
 
-    // Constructor güncellendi: phone ve email eklendi
     public User(int id, String tcNo, String username, String password, String fullName, String phone, String email, String role) {
         this.id = id;
         this.tcNo = tcNo;
@@ -24,13 +23,12 @@ public abstract class User {
 
     public abstract void showMenu();
 
-    // Getter Metotları
     public int getId() { return id; }
     public String getTcNo() { return tcNo; }
     public String getUsername() { return username; }
     public String getPassword() { return password; }
     public String getFullName() { return fullName; }
-    public String getPhone() { return phone; } // YENİ
-    public String getEmail() { return email; } // YENİ
+    public String getPhone() { return phone; }
+    public String getEmail() { return email; }
     public String getRole() { return role; }
 }

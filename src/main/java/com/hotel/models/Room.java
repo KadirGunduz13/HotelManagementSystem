@@ -5,7 +5,7 @@ public abstract class Room {
     protected String roomNumber;
     protected double price;
     protected int capacity;
-    protected String status; // AVAILABLE, RESERVED, FULL
+    protected String status;
 
     public Room(int id, String roomNumber, double price, int capacity, String status) {
         this.id = id;
@@ -22,19 +22,16 @@ public abstract class Room {
 
     public abstract String getType();
 
-    // --- GETTER METOTLARI (EKSİK OLANLAR EKLENDİ) ---
     public int getId() { return id; }
     public String getRoomNumber() { return roomNumber; }
     public double getPrice() { return price; }
     public int getCapacity() { return capacity; }
 
-    // İŞTE HATAYI ÇÖZEN SATIR BU:
     public String getStatus() { return status; }
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
-    // BU METOD EKSİKTİ, O YÜZDEN ID SIFIR KALIYORDU
     public void setId(int id) {
         this.id = id;
     }

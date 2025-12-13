@@ -7,7 +7,6 @@ public class RoomFactory {
     public static Room createRoom(String type, int capacity, String roomNumber, double price, String status) {
         Room room = null;
 
-        // Artık kapasiteyi de parametre olarak gönderiyoruz
         switch (type.toUpperCase()) {
             case "STANDARD":
                 room = new StandardRoom(0, roomNumber, price, capacity, status);

@@ -1,9 +1,9 @@
 package com.hotel.patterns;
 
 public class BreakfastDecorator implements ICost {
-    private ICost wrappedObj; // Kaplanan obje
+    private ICost wrappedObj;
     private long days;
-    private final double BREAKFAST_PRICE = 500.0; // Günlük kahvaltı ücreti
+    private final double BREAKFAST_PRICE = 500.0;
 
     public BreakfastDecorator(ICost wrappedObj, long days) {
         this.wrappedObj = wrappedObj;
@@ -12,7 +12,6 @@ public class BreakfastDecorator implements ICost {
 
     @Override
     public double getCost() {
-        // Mevcut fiyata + (Gün Sayısı * Kahvaltı Ücreti) ekle
         return wrappedObj.getCost() + (days * BREAKFAST_PRICE);
     }
 }

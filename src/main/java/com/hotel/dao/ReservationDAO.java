@@ -24,29 +24,21 @@ public class ReservationDAO {
             int result = stmt.executeUpdate();
 
             if (result > 0) {
-                // --- DÜZELTME BURADA ---
-                // ID'leri kullanarak gerçek İsim ve Oda Numarasını buluyoruz
                 String customerName = getCustomerNameById(res.getCustomerId());
                 String roomNumber = getRoomNumberById(res.getRoomId());
 
-                // Log Mesajını anlamlı hale getiriyoruz
                 String logMessage = "Yeni Rezervasyon! Müşteri: " + customerName +
                         " | Oda: " + roomNumber +
                         " | Tutar: " + res.getTotalPrice() + " TL";
 
-                // Observer'ı tetikle
                 try {
-                    // HATA ÇÖZÜMÜ: 'new' yerine 'getInstance()' kullanıyoruz
                     com.hotel.patterns.NotificationManager notifier = com.hotel.patterns.NotificationManager.getInstance();
 
-                    // Listeyi temizle (Böylece aynı SMS 2 kere gitmez)
                     notifier.removeAllObservers();
 
-                    // Gözlemcileri ekle
                     notifier.addObserver(new com.hotel.patterns.ManagerSMSObserver());
                     notifier.addObserver(new com.hotel.patterns.DatabaseLoggerObserver());
 
-                    // Bildirimi Gönder
                     notifier.notifyAll(logMessage);
 
                 } catch(Exception e) {
@@ -61,7 +53,6 @@ public class ReservationDAO {
         }
     }
 
-    // YARDIMCI METOT 1: ID'den Müşteri İsmini Bulur
     private String getCustomerNameById(int id) {
         String sql = "SELECT full_name FROM users WHERE id = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -73,7 +64,6 @@ public class ReservationDAO {
         return "Bilinmiyor";
     }
 
-    // YARDIMCI METOT 2: ID'den Oda Numarasını Bulur
     private String getRoomNumberById(int id) {
         String sql = "SELECT room_number FROM rooms WHERE id = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -85,7 +75,6 @@ public class ReservationDAO {
         return "Bilinmiyor";
     }
 
-    // --- MEVCUT DİĞER METOTLAR (DEĞİŞMEDİ) ---
 
     public List<Reservation> getAllReservations() {
         List<Reservation> list = new ArrayList<>();

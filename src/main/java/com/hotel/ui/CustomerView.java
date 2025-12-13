@@ -39,7 +39,6 @@ public class CustomerView {
 
         TabPane tabPane = new TabPane();
 
-        // SEKME 1: Gelişmiş Arama
         Tab searchTab = new Tab("Oda Ara & Kirala", createSearchContent());
         searchTab.setClosable(false);
 
@@ -51,13 +50,11 @@ public class CustomerView {
 
         tabPane.getTabs().addAll(searchTab, historyTab, profileTab);
 
-        Scene scene = new Scene(tabPane, 1000, 650); // Ekranı biraz genişlettik
+        Scene scene = new Scene(tabPane, 1000, 650);
         stage.setScene(scene);
         stage.show();
     }
 
-    // --- 1. GELİŞMİŞ ODA ARAMA SAYFASI ---
-    // CustomerView.java -> createSearchContent metodu
     private VBox createSearchContent() {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(15));
@@ -65,7 +62,6 @@ public class CustomerView {
         Label lblInfo = new Label("Arama Kriterlerini Belirleyiniz:");
         lblInfo.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        // --- FİLTRELEME ALANI ---
         HBox filterBox = new HBox(10);
         filterBox.setStyle("-fx-padding: 15; -fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;");
 
@@ -88,7 +84,6 @@ public class CustomerView {
 
         filterBox.getChildren().addAll(new Label("Giriş:"), dpCheckIn, new Label("Çıkış:"), dpCheckOut, new Label("Tip:"), cmbType, new Label("Kişi:"), txtCapacity, btnSearch);
 
-        // --- TABLO ---
         TableView<Room> table = new TableView<>();
         TableColumn<Room, String> colNum = new TableColumn<>("Oda No"); colNum.setCellValueFactory(new PropertyValueFactory<>("roomNumber"));
         TableColumn<Room, String> colType = new TableColumn<>("Tip"); colType.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -99,13 +94,11 @@ public class CustomerView {
 
         table.getColumns().addAll(colNum, colType, colCap, colPrice, colStatus);
 
-        // --- ALT KISIM (STRATEGY DESENİ EKLENDİ) ---
         HBox bottomBox = new HBox(15);
         bottomBox.setPadding(new Insets(10, 0, 0, 0));
 
         CheckBox chkBreakfast = new CheckBox("Kahvaltı Ekle (+500 TL)");
 
-        // Ödeme Yöntemi Seçimi
         ComboBox<String> cmbPayment = new ComboBox<>();
         cmbPayment.getItems().addAll("Kredi Kartı", "Banka Havalesi");
         cmbPayment.getSelectionModel().selectFirst();
@@ -115,7 +108,6 @@ public class CustomerView {
 
         bottomBox.getChildren().addAll(chkBreakfast, new Label("Ödeme:"), cmbPayment, btnBook);
 
-        // --- AKSİYONLAR ---
         btnSearch.setOnAction(e -> {
             List<Room> allRooms = roomDAO.getAllRooms();
             String selectedType = cmbType.getValue();
@@ -141,12 +133,10 @@ public class CustomerView {
             long days = ChronoUnit.DAYS.between(inDate, outDate);
             if (days < 1) { showAlert("Tarih hatalı!", Alert.AlertType.ERROR); return; }
 
-            // Decorator Deseni (Fiyat Hesaplama)
             com.hotel.patterns.ICost costCalc = new com.hotel.patterns.BaseReservationCost(selectedRoom.getPrice(), days);
             if (chkBreakfast.isSelected()) costCalc = new com.hotel.patterns.BreakfastDecorator(costCalc, days);
             double finalPrice = costCalc.getCost();
 
-            // STRATEGY DESENİ (Ödeme İşlemi)
             com.hotel.patterns.PaymentStrategy paymentStrategy;
             String method = cmbPayment.getValue();
 
@@ -162,9 +152,7 @@ public class CustomerView {
 
             confirm.showAndWait().ifPresent(resp -> {
                 if (resp == ButtonType.YES) {
-                    // Önce ödemeyi yap (Strategy Deseni Çalışır)
                     if (finalStrategy.pay(finalPrice)) {
-                        // Sonra rezervasyonu kaydet
                         Reservation res = new Reservation(0, currentCustomer.getId(), selectedRoom.getId(), Date.valueOf(inDate), Date.valueOf(outDate), finalPrice, "PENDING");
                         if (reservationDAO.createReservation(res)) {
                             roomDAO.updateRoomStatus(selectedRoom.getId(), "RESERVED");
@@ -182,7 +170,6 @@ public class CustomerView {
 
     private void showAlert(String msg, Alert.AlertType type) { new Alert(type, msg).show(); }
 
-    // --- 2. GEÇMİŞ REZERVASYONLAR SAYFASI (Değişmedi) ---
     private VBox createHistoryContent() {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(15));
@@ -209,7 +196,6 @@ public class CustomerView {
 
         table.getColumns().addAll(colRoom, colIn, colOut, colPrice, colStatus);
 
-        // --- BUTONLAR ---
         HBox buttonBox = new HBox(10);
 
         Button btnRefresh = new Button("Yenile");
@@ -218,7 +204,6 @@ public class CustomerView {
         Button btnCancel = new Button("Seçili Rezervasyonu İptal Et");
         btnCancel.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold;"); // Kırmızı Buton
 
-        // İPTAL BUTONU AKSİYONU
         btnCancel.setOnAction(e -> {
             Reservation selected = table.getSelectionModel().getSelectedItem();
             if (selected == null) {
@@ -226,7 +211,6 @@ public class CustomerView {
                 return;
             }
 
-            // Sadece PENDING olanlar iptal edilebilir (Giriş yapılmışsa iptal edilemez)
             if (!"PENDING".equals(selected.getStatus())) {
                 new Alert(Alert.AlertType.ERROR, "Sadece 'Beklemede' (PENDING) olan rezervasyonlar iptal edilebilir!").show();
                 return;
@@ -247,14 +231,13 @@ public class CustomerView {
             });
         });
 
-        btnRefresh.fire(); // Sayfa açılınca verileri yükle
+        btnRefresh.fire();
 
         buttonBox.getChildren().addAll(btnRefresh, btnCancel);
         layout.getChildren().addAll(lblTitle, buttonBox, table);
         return layout;
     }
 
-    // --- 3. PROFIL GÜNCELLEME SAYFASI (Değişmedi) ---
     private VBox createProfileContent() {
         VBox layout = new VBox(15);
         layout.setPadding(new Insets(20));

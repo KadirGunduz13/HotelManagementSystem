@@ -24,13 +24,11 @@ public class RegisterView {
         Label lblTitle = new Label("Kayıt Ol");
         lblTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        // Form Düzeni (GridPane: Satır ve sütun mantığı)
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setAlignment(Pos.CENTER);
 
-        // --- Alanlar ---
         TextField txtName = new TextField();
         txtName.setPromptText("Ad Soyad");
 
@@ -49,7 +47,6 @@ public class RegisterView {
         PasswordField txtPass = new PasswordField();
         txtPass.setPromptText("Şifre");
 
-        // Grid'e yerleştirme (Sütun, Satır)
         grid.add(new Label("Ad Soyad:"), 0, 0);
         grid.add(txtName, 1, 0);
 
@@ -72,9 +69,7 @@ public class RegisterView {
         btnRegister.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px;");
         btnRegister.setMaxWidth(Double.MAX_VALUE);
 
-        // --- KAYIT BUTONU AKSİYONU ---
         btnRegister.setOnAction(e -> {
-            // Boş alan kontrolü
             if (txtName.getText().isEmpty() || txtTc.getText().isEmpty() || txtUser.getText().isEmpty() || txtPass.getText().isEmpty()) {
                 new Alert(Alert.AlertType.WARNING, "Lütfen zorunlu alanları doldurunuz!").show();
                 return;
@@ -91,7 +86,7 @@ public class RegisterView {
 
             if (isSuccess) {
                 new Alert(Alert.AlertType.INFORMATION, "Kayıt Başarılı! Giriş yapabilirsiniz.").showAndWait();
-                stage.close(); // Pencereyi kapat
+                stage.close();
             } else {
                 new Alert(Alert.AlertType.ERROR, "Kayıt Başarısız! (TC veya Kullanıcı Adı kullanılıyor olabilir)").show();
             }

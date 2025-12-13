@@ -33,7 +33,6 @@ public class StaffDashboardView {
     private final UserDAO userDAO = new UserDAO();
     private final ReservationDAO reservationDAO = new ReservationDAO();
 
-    // DÜZELTME 1: Bu ComboBox'ı sınıf seviyesine taşıdık ki her yerden erişebilelim
     private ComboBox<Customer> cmbCustomer;
 
     public void show() {
@@ -52,7 +51,6 @@ public class StaffDashboardView {
         Tab reservationTab = new Tab("Rezervasyonlar", createReservationContent());
         reservationTab.setClosable(false);
 
-        // DÜZELTME 2: Rezervasyon sekmesine tıklandığında listeyi yenile
         reservationTab.setOnSelectionChanged(e -> {
             if (reservationTab.isSelected()) {
                 refreshCustomerCombo(); // Müşteri listesini güncelle
@@ -68,14 +66,12 @@ public class StaffDashboardView {
         stage.show();
     }
 
-    // Yardımcı Metot: Müşteri Listesini Yeniler
     private void refreshCustomerCombo() {
         if (cmbCustomer != null) {
             cmbCustomer.setItems(FXCollections.observableArrayList(userDAO.searchCustomers("")));
         }
     }
 
-    // --- 3. REZERVASYON SEKMESİ ---
     private VBox createReservationContent() {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
@@ -90,12 +86,10 @@ public class StaffDashboardView {
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(10));
 
-        // 1. Müşteri Seçimi (Artık sınıf değişkenini kullanıyoruz)
         cmbCustomer = new ComboBox<>();
         cmbCustomer.setPromptText("Müşteri Seçiniz");
         cmbCustomer.setPrefWidth(200);
 
-        // İlk yükleme
         refreshCustomerCombo();
 
         cmbCustomer.setConverter(new StringConverter<Customer>() {
@@ -105,13 +99,11 @@ public class StaffDashboardView {
             public Customer fromString(String string) { return null; }
         });
 
-        // 2. Tarih Seçimi
         DatePicker dpIn = new DatePicker(LocalDate.now());
         dpIn.setPromptText("Giriş Tarihi");
         DatePicker dpOut = new DatePicker(LocalDate.now().plusDays(1));
         dpOut.setPromptText("Çıkış Tarihi");
 
-        // 3. Oda Filtreleme
         TextField txtCapacity = new TextField();
         txtCapacity.setPromptText("Kişi Sayısı");
         txtCapacity.setPrefWidth(80);
@@ -119,14 +111,12 @@ public class StaffDashboardView {
         Button btnFindRooms = new Button("Uygun Odaları Getir");
         ComboBox<Room> cmbRoom = new ComboBox<>();
         cmbRoom.setPromptText("Önce Oda Arayınız");
-        cmbRoom.setPrefWidth(250); // Genişliği biraz artırdık ki sığsın
+        cmbRoom.setPrefWidth(250);
 
-        // GÜNCELLEME: Listede görünecek metni değiştiriyoruz
         cmbRoom.setConverter(new StringConverter<Room>() {
             @Override
             public String toString(Room r) {
                 if (r == null) return "";
-                // Yeni Format: "Oda: 301 (FAMILY - 5 Kişilik) - 4500.0 TL"
                 return "Oda: " + r.getRoomNumber() +
                         " (" + r.getType() + " - " + r.getCapacity() + " Kişilik) - " +
                         r.getPrice() + " TL";
@@ -145,24 +135,19 @@ public class StaffDashboardView {
             final int finalCap = capacity;
 
             List<Room> availableRooms = roomDAO.getAllRooms().stream()
-                    // 1. Sadece Müsait Olanları Al
                     .filter(r -> "AVAILABLE".equals(r.getStatus()))
-                    // 2. Kapasitesi yetenleri Al (Örn: 2 girdiyse 2,3,4,5 hepsi gelir)
                     .filter(r -> r.getCapacity() >= finalCap)
-                    // 3. SIRALAMA (Burayı Ekledik)
-                    // Önce Kapasiteye göre Küçükten -> Büyüğe (2, 3, 4...)
-                    // Sonra Oda Numarasına göre (101, 102...)
                     .sorted(java.util.Comparator.comparingInt(Room::getCapacity)
                             .thenComparing(Room::getRoomNumber))
                     .collect(Collectors.toList());
 
             if(availableRooms.isEmpty()) {
                 showAlert("Uygun oda bulunamadı!", Alert.AlertType.WARNING);
-                cmbRoom.getItems().clear(); // Liste boşsa temizle
+                cmbRoom.getItems().clear();
             } else {
                 cmbRoom.setItems(FXCollections.observableArrayList(availableRooms));
-                cmbRoom.getSelectionModel().selectFirst(); // İlk sıradakini (en uygununu) otomatik seç
-                cmbRoom.show(); // Listeyi otomatik aç
+                cmbRoom.getSelectionModel().selectFirst();
+                cmbRoom.show();
             }
         });
 
@@ -273,7 +258,6 @@ public class StaffDashboardView {
         table.setItems(FXCollections.observableArrayList(reservationDAO.getAllReservations()));
     }
 
-    // --- MÜŞTERİ SEKMESİ (Değişmedi - Önceki kodun aynısı) ---
     private VBox createCustomerContent() {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
@@ -335,7 +319,6 @@ public class StaffDashboardView {
         });
         btnSearch.setOnAction(e -> table.setItems(FXCollections.observableArrayList(userDAO.searchCustomers(txtSearch.getText()))));
 
-        // SAĞ TIK MENÜSÜ EKLENDİ
         ContextMenu contextMenu = new ContextMenu();
         MenuItem detailsItem = new MenuItem("Müşteri Detaylarını Gör");
         detailsItem.setOnAction(e -> {
@@ -349,7 +332,6 @@ public class StaffDashboardView {
         return layout;
     }
 
-    // --- ODA SEKMESİ (Değişmedi - Önceki kodun aynısı) ---
     private VBox createRoomContent() {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
@@ -375,9 +357,7 @@ public class StaffDashboardView {
         TableColumn<Room, String> colType = new TableColumn<>("Tip");
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
 
-        // --- HATALI KISIM BURASIYDI ---
         TableColumn<Room, Integer> colCap = new TableColumn<>("Kapasite");
-        // Buranın "id" DEĞİL "capacity" olduğundan emin ol:
         colCap.setCellValueFactory(new PropertyValueFactory<>("capacity"));
 
         TableColumn<Room, Double> colPrice = new TableColumn<>("Fiyat");

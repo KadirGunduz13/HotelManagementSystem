@@ -14,19 +14,16 @@ public class NotificationManager {
         return instance;
     }
 
-    // Abone Ekle
     public void addObserver(IObserver observer) {
         observers.add(observer);
     }
 
-    // Herkese Haber Ver
     public void notifyAll(String message) {
         for (IObserver observer : observers) {
             observer.update(message);
         }
     }
 
-    // Gözlemci listesini temizlemek için yardımcı metot
     public void removeAllObservers() {
         observers.clear();
     }

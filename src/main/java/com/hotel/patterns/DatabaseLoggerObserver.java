@@ -9,7 +9,6 @@ public class DatabaseLoggerObserver implements IObserver {
 
     @Override
     public void update(String message) {
-        // SQL: Mesajı logs tablosuna kaydet
         String sql = "INSERT INTO logs (message) VALUES (?)";
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();

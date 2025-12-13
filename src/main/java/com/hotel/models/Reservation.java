@@ -11,11 +11,9 @@ public class Reservation {
     private double totalPrice;
     private String status;
 
-    // EKSTRA ALANLAR (Tabloda isim göstermek için)
-    private String customerName; // Müşteri Adı
-    private String roomNumber;   // Oda Numarası
+    private String customerName;
+    private String roomNumber;
 
-    // Constructor (Yapıcı Metot)
     public Reservation(int id, int customerId, int roomId, Date checkInDate, Date checkOutDate, double totalPrice, String status) {
         this.id = id;
         this.customerId = customerId;
@@ -26,7 +24,6 @@ public class Reservation {
         this.status = status;
     }
 
-    // --- GETTER ve SETTER Metotları ---
     public int getId() { return id; }
     public int getCustomerId() { return customerId; }
     public int getRoomId() { return roomId; }
@@ -35,7 +32,6 @@ public class Reservation {
     public double getTotalPrice() { return totalPrice; }
     public String getStatus() { return status; }
 
-    // Yeni Eklenen Getter/Setter'lar
     public String getCustomerName() { return customerName; }
     public void setCustomerName(String customerName) { this.customerName = customerName; }
 

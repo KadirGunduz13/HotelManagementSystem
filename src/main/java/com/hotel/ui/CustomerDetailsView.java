@@ -26,13 +26,12 @@ public class CustomerDetailsView {
 
     public void show() {
         Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL); // Ana ekranı bloklar (Focus buraya gelir)
+        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle("Müşteri Detayları: " + customer.getFullName());
 
         VBox layout = new VBox(15);
         layout.setPadding(new Insets(20));
 
-        // --- 1. MÜŞTERİ KİMLİK KARTI ---
         Label lblInfo = new Label("Müşteri Bilgileri");
         lblInfo.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
 
@@ -47,7 +46,6 @@ public class CustomerDetailsView {
                 new Label("Kullanıcı Adı: " + customer.getUsername())
         );
 
-        // --- 2. REZERVASYON VE ÖDEME GEÇMİŞİ ---
         Label lblHistory = new Label("Rezervasyon & Ödeme Geçmişi");
         lblHistory.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
 
@@ -70,12 +68,10 @@ public class CustomerDetailsView {
 
         table.getColumns().addAll(colRoom, colIn, colOut, colPrice, colStatus);
 
-        // Verileri Yükle
         table.setItems(FXCollections.observableArrayList(
                 reservationDAO.getReservationsByCustomerId(customer.getId())
         ));
 
-        // Eğer liste boşsa uyarı
         table.setPlaceholder(new Label("Bu müşteriye ait kayıt bulunamadı."));
 
         layout.getChildren().addAll(lblInfo, infoBox, lblHistory, table);
