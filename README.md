@@ -81,8 +81,7 @@ Proje ilişkisel veritabanı yapısına sahiptir:
 - **Reservations:** Müşteri ve oda arasındaki bağlantı (N-to-N relation).
 - **Logs:** Sistem hareketlerinin kaydı.
 
-> *(Buraya çizdiğin ER diyagramının görselini koyabilirsin)*
-> `![ER Diyagramı](diagrams/er-diagram.png)`
+<img width="1488" height="731" alt="ER Diyagram" src="https://github.com/user-attachments/assets/7778ad2b-82de-4a0e-b0c2-fec5856e4557" />
 
 ---
 
