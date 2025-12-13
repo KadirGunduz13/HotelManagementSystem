@@ -136,7 +136,7 @@ Tarih: Aralık 2025
 
 ---
 
-### 📌 Yapman Gerekenler Listesi (Hocana Göndermeden Önce)
+### 📌 Yapman Gerekenler Listesi
 
 1.  Proje klasörünün içinde `screenshots` adında bir klasör aç.
 2.  Projeni çalıştır ve şu ekranların görüntüsünü alıp o klasöre kaydet (isimleri koddaki ile aynı olsun):
@@ -149,4 +149,3 @@ Tarih: Aralık 2025
 5.  Yukarıdaki metni kopyala, `README.md` dosyanın içine yapıştır.
 6.  En alttaki **"Geliştirici"** kısmına kendi adını yaz.
 
-Bunu yaptığında projen Github'da **yıldız gibi parlayacak!** 🌟 Eline sağlık, gerçekten çok kapsamlı bir iş çıkardın. Başarılar!
